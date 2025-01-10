@@ -20,6 +20,11 @@ class MainActivity : AppCompatActivity() {
     private var firstTurn = Turn.CROSS
     private var currentTurn = Turn.CROSS
 
+    private var crossesScore = 0
+    private var circlesScore = 0
+
+    private var victory = false
+
     private var boardList = mutableListOf<Button>()
 
     private lateinit var binding : ActivityMainBinding
@@ -47,15 +52,58 @@ class MainActivity : AppCompatActivity() {
         if(view !is Button)
             return
         addToBoard(view)
-        
-        if(fullBoard()){
+
+        if(checkForWinner(CIRCLE)){
+            victory = true
+            circlesScore++
+            result("Circle WINS!")
+        }
+
+        if(checkForWinner(CROSS)){
+            victory = true
+            crossesScore++
+            result("Cross WINS!")
+        }
+
+        if(fullBoard() && !victory){
             result("Draw")
         }
     }
 
+    private fun checkForWinner(s: String): Boolean {
+
+        //Horizontal Victory
+        if(match(binding.a1, s) && match(binding.a2, s) && match(binding.a3, s))
+            return true
+        if(match(binding.b1, s) && match(binding.b2, s) && match(binding.b3, s))
+            return true
+        if(match(binding.c1, s) && match(binding.c2, s) && match(binding.c3, s))
+            return true
+
+        //Vertical Victory
+        if(match(binding.a1, s) && match(binding.b1, s) && match(binding.c1, s))
+            return true
+        if(match(binding.a2, s) && match(binding.b2, s) && match(binding.c2, s))
+            return true
+        if(match(binding.a3, s) && match(binding.b3, s) && match(binding.c3, s))
+            return true
+
+        //Diagonal Victory
+        if(match(binding.a1, s) && match(binding.b2, s) && match(binding.c3, s))
+            return true
+        if(match(binding.a3, s) && match(binding.b2, s) && match(binding.c1, s))
+            return true
+
+        return false
+    }
+
+    private fun match(button: Button, symbol: String): Boolean = button.text == symbol
+
     private fun result(title: String) {
+        val message = "\n Circles: $circlesScore \n\n Crosses: $crossesScore"
         AlertDialog.Builder(this)
             .setTitle(title)
+            .setMessage(message)
             .setPositiveButton("Reset"){
                 _,_ ->
                 resetBoard()
@@ -74,6 +122,7 @@ class MainActivity : AppCompatActivity() {
             firstTurn = Turn.CIRCLE
 
         currentTurn = firstTurn
+        victory = false
         setTurnLabel()
     }
 
