@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -46,6 +47,42 @@ class MainActivity : AppCompatActivity() {
         if(view !is Button)
             return
         addToBoard(view)
+        
+        if(fullBoard()){
+            result("Draw")
+        }
+    }
+
+    private fun result(title: String) {
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setPositiveButton("Reset"){
+                _,_ ->
+                resetBoard()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun resetBoard() {
+        for(button in boardList){
+            button.text = ""
+        }
+        if(firstTurn == Turn.CIRCLE)
+            firstTurn = Turn.CROSS
+        else if(firstTurn == Turn.CROSS)
+            firstTurn = Turn.CIRCLE
+
+        currentTurn = firstTurn
+        setTurnLabel()
+    }
+
+    private fun fullBoard(): Boolean {
+        for(button in boardList){
+            if(button.text == "")
+                return false
+        }
+        return true
     }
 
     private fun addToBoard(button: Button) {
